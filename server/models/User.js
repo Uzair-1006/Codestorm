@@ -1,10 +1,12 @@
-import mongoose from "mongoose";
+const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
-  name: String,
-  email: { type: String, unique: true },
-  password: String,
-  role: { type: String, enum: ["jobseeker", "hr"], default: "jobseeker" }
+  name: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  role: { type: String, enum: ['candidate', 'hr'], default: 'candidate' },
+  resume: { type: String }, // file name of the uploaded resume
+  id: { type: String }, // government ID or unique identifier
 });
 
-export default mongoose.model("User", userSchema);
+module.exports = mongoose.model('User', userSchema);
