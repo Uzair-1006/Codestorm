@@ -72,7 +72,6 @@ exports.register = async (req, res) => {
 };
 
 // Login Controller
-// Login Controller
 exports.login = async (req, res) => {
     const { email, password } = req.body;
   
@@ -83,14 +82,29 @@ exports.login = async (req, res) => {
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
   
-      const token = jwt.sign({ userId: user._id, role: user.role, name: user.name }, process.env.JWT_SECRET, {
-        expiresIn: '1h',
-      });
+      // Generate access token (24 hours)
+      const accessToken = jwt.sign(
+        { userId: user._id, role: user.role, name: user.name }, 
+        process.env.JWT_SECRET, 
+        { expiresIn: '24h' }
+      );
   
-      res.json({ token, role: user.role, name: user.name });  // Add `name` here
+      // Generate refresh token (7 days)
+      const refreshToken = jwt.sign(
+        { userId: user._id },
+        process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET,
+        { expiresIn: '7d' }
+      );
+  
+      res.json({ 
+        token: accessToken,
+        refreshToken,
+        role: user.role, 
+        name: user.name 
+      });
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: 'Something went wrong. Please try again later.' });
     }
-  };
+};
   

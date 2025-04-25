@@ -20,18 +20,20 @@ export default function LoginPage() {
       const res = await axios.post("http://localhost:5000/api/auth/login", formData);
       console.log('Login response:', res.data);
       
+      // Store tokens and user data
       localStorage.setItem("token", res.data.token);
+      localStorage.setItem("refreshToken", res.data.refreshToken);
       localStorage.setItem("role", res.data.role);
       localStorage.setItem("name", res.data.name);
       
-      console.log('Stored role:', localStorage.getItem('role'));
+      console.log('Stored tokens and user data');
       
       alert("Login successful!");
       
       const userRole = res.data.role?.toLowerCase();
       console.log('User role for redirection:', userRole);
       
-      if (userRole.toLowerCase() === 'hr') {
+      if (userRole === 'hr') {
         console.log('Redirecting to HR dashboard');
         window.location.href = '/hr-dashboard';
       } else {

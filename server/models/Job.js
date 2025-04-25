@@ -5,6 +5,10 @@ const JobSchema = new mongoose.Schema({
   company: String,
   description: String,
   companyImage: String,
+  stipend: {
+    type: String,
+    required: false
+  },
   postedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   applications: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Application' }],
 }, { timestamps: true });

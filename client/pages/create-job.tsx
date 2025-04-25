@@ -1,10 +1,12 @@
 "use client";
 import { useState } from 'react';
 import { useRouter } from 'next/router';
+import api from '../utils/api';
 
 export default function CreateJobPage() {
   const router = useRouter();
   const [title, setTitle] = useState('');
+  const [salary, setSalary] = useState('');
   const [company, setCompany] = useState('');
   const [description, setDescription] = useState('');
   const [companyImage, setCompanyImage] = useState<File | null>(null);
@@ -21,7 +23,7 @@ export default function CreateJobPage() {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
-    if (!title || !company || !description) {
+    if (!title || !company || !description || !salary) {
       setError("All fields are required.");
       return;
     }
@@ -37,33 +39,24 @@ export default function CreateJobPage() {
     formData.append('title', title);
     formData.append('company', company);
     formData.append('description', description);
+    formData.append('salary', salary);
     if (companyImage) {
       formData.append('companyImage', companyImage);
     }
 
     try {
-      console.log('Creating job with data:', { title, company, description });
-      const response = await fetch('http://localhost:5000/api/jobs', {
-        method: 'POST',
+      const response = await api.post('/jobs', formData, {
         headers: {
+          'Content-Type': 'multipart/form-data',
           'Authorization': `Bearer ${token}`
         },
-        body: formData,
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to create job posting');
-      }
-
-      const data = await response.json();
-      console.log('Create job response:', data);
 
       setLoading(false);
       router.push('/hr-dashboard');
     } catch (error: any) {
       setLoading(false);
-      setError(error.message || 'Failed to create job posting. Please try again later.');
+      setError(error.response?.data?.message || 'Failed to create job posting. Please try again later.');
       console.error('Error creating job:', error);
     }
   };
@@ -84,6 +77,19 @@ export default function CreateJobPage() {
               onChange={(e) => setTitle(e.target.value)}
               className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-md"
               required
+            />
+          </div>
+
+          <div className="mb-4">
+            <label htmlFor="salary" className="block text-sm font-medium text-gray-600">Salary</label>
+            <input
+              type="number"
+              id="salary"
+              value={salary}
+              onChange={(e) => setSalary(e.target.value)}
+              className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-md"
+              required
+              min="0"
             />
           </div>
 

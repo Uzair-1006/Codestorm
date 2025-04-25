@@ -11,6 +11,9 @@ dotenv.config();
 // Initialize app
 const app = express();
 
+// Initialize router
+const router = express.Router();
+
 // Middleware
 app.use(cors());
 app.use(express.json());
@@ -31,7 +34,11 @@ mongoose.connect(process.env.MONGO_URI, {
 const authRoutes = require('./routes/auth');
 app.use('/api/auth', authRoutes);
 app.use('/api', userRoutes); // All routes in userRoutes.js will be prefixed with /api
-app.use('/api/jobs', hrRoutes); // HR routes for job management
+app.use('/api/hr', hrRoutes);  // Prefix '/api/hr' to all routes defined in hrRoutes
+
+
+// Add this router to your app
+app.use('/api/hr', router); // Prefix this route under /api/hr
 
 // Root route
 app.get('/', (req, res) => {
